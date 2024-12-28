@@ -1,0 +1,66 @@
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+#include <EduIntro.h>
+
+DHT11 dht11(D7); 
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+int Relay = 13;
+int sensor = 8;
+int val,i;
+
+int C;   
+int H; 
+void setup() {
+  pinMode(13, OUTPUT); //relay
+  pinMode(8, INPUT);//soil moisture
+  
+  pinMode(9,OUTPUT);//buzzer
+  pinMode(10,INPUT);//iR
+  lcd.begin();
+  lcd.backlight();
+  lcd.clear();
+  lcd.setCursor(0,0); 
+  lcd.print("H   C   MOIS OBJ");
+ 
+  pinMode(1,INPUT);  
+  Serial.begin(9600);
+}
+
+void loop() {
+  lcd.setCursor(0,1);
+  dht11.update();
+  
+  C = dht11.readCelsius();         
+  H = dht11.readHumidity(); 
+  Serial.print("H: ");
+  Serial.print(H);
+  lcd.print(H);
+  lcd.print("  ");
+  Serial.print("\tC: ");
+  Serial.print(C);
+  lcd.print(C);
+  lcd.print("  ");
+  delay(1000);
+  val = digitalRead(8);
+  if (val == LOW)
+  {
+    digitalWrite(13, HIGH);
+    lcd.print("HIGH ");
+  }
+  else
+  {
+    digitalWrite(13, LOW);
+    lcd.print("LOW  ");
+  }
+  if(digitalRead(10) == LOW)
+  {
+    digitalWrite(9,HIGH);
+    lcd.print("YES");
+  }
+  else{
+    digitalWrite(9,LOW);
+    lcd.print("NO ");    
+  }
+  delay(400);
+}
